@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>智能工牌 IoT 系统</title>
+<style>
+:root{
+  --bg:#f4f7fb;--panel:#fff;--line:#e7ecf3;--text:#162033;--muted:#6f7b90;
+  --primary:#2f6fed;--primary2:#eaf1ff;--green:#18a05e;--greenbg:#eaf8f1;
+  --red:#e44f4f;--redbg:#fff0f0;--orange:#e58a20;--orangebg:#fff6e9;
+  --nav:#101a2d;--nav2:#17243b;--shadow:0 6px 24px rgba(31,51,84,.07);--radius:14px;
+}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}.app{display:flex;min-height:100vh}.sidebar{width:250px;background:linear-gradient(180deg,#0e1829,#122039);color:#d7e0ef;position:fixed;inset:0 auto 0 0;overflow:auto}
+.brand{height:74px;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:12px}.logo{width:38px;height:38px;border-radius:10px;background:#fff;color:#111827;display:grid;place-items:center;font-weight:800}.brand h1{font-size:17px;margin:0}.brand p{font-size:11px;color:#94a1b7;margin:4px 0 0}
+.nav-section{padding:16px 10px 8px}.nav-title{font-size:11px;color:#718198;padding:0 12px 8px}.nav-item,.nav-sub{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;cursor:pointer;margin:3px 0;user-select:none}.nav-item:hover,.nav-sub:hover{background:rgba(255,255,255,.06)}.nav-item.active,.nav-sub.active{background:var(--primary);color:#fff}.nav-sub{padding-left:38px;font-size:14px}.nav-item .ico{width:18px;text-align:center}.chev{margin-left:auto;font-size:11px}.subwrap{display:none}.subwrap.open{display:block}
+.main{margin-left:250px;min-width:0;flex:1}.topbar{height:66px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:20}.crumb{font-size:14px;color:#667085}.crumb b{color:#182338}.topright{display:flex;gap:10px;align-items:center}.pill{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:#f8fafc;color:#596579;font-size:13px}.avatar{width:36px;height:36px;border-radius:50%;background:#172033;color:white;display:grid;place-items:center;font-weight:700}
+.content{padding:28px}.pagehead{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:20px}.pagehead h2{margin:0 0 6px;font-size:28px}.pagehead p{margin:0;color:var(--muted);font-size:14px}.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{border:1px solid #d9e0ea;background:#fff;color:#263247;border-radius:9px;padding:9px 14px;cursor:pointer}.btn:hover{border-color:#aebbd0}.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}.btn.danger{color:var(--red);border-color:#ffb9b9;background:#fff}.btn.link{border:0;background:transparent;color:var(--primary);padding:4px 6px}.btn.small{padding:6px 10px;font-size:13px}
+.grid{display:grid;gap:16px}.cards{grid-template-columns:repeat(5,minmax(0,1fr));margin-bottom:16px}.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.metric{padding:18px}.metric .label{color:var(--muted);font-size:13px}.metric .num{font-size:28px;font-weight:750;margin:10px 0 6px}.metric .hint{font-size:12px;color:#8190a4}.metric .good{color:var(--green)}.metric .warn{color:var(--orange)}
+.panel{padding:18px}.panel h3{font-size:16px;margin:0}.panelhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.two{grid-template-columns:1.35fr .9fr}.three{grid-template-columns:1fr 1fr 1fr}.chart{height:300px;display:flex;align-items:flex-end;gap:18px;padding:28px 12px 24px;border-top:1px solid #eef2f7;position:relative}.chart:before{content:"";position:absolute;left:0;right:0;top:25%;bottom:25%;background:linear-gradient(to bottom,transparent 49%,#edf1f6 50%,transparent 51%);pointer-events:none}.bar{flex:1;background:linear-gradient(180deg,#6ea0ff,#2f6fed);border-radius:8px 8px 2px 2px;min-width:24px;position:relative}.bar span{position:absolute;left:50%;transform:translateX(-50%);bottom:-22px;font-size:12px;color:#718096;white-space:nowrap}.bar em{position:absolute;left:50%;transform:translateX(-50%);top:-22px;font-size:11px;color:#516070;font-style:normal}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px}.table{width:100%;border-collapse:collapse;min-width:1000px}.table th,.table td{padding:13px 14px;border-bottom:1px solid #edf1f5;text-align:left;font-size:13px;white-space:nowrap}.table th{background:#f8fafc;color:#667085;font-weight:650}.table tr:last-child td{border-bottom:none}.table tbody tr:hover{background:#fbfdff}.status{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:650}.status:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}.online,.success{color:var(--green);background:var(--greenbg)}.offline,.fail{color:var(--red);background:var(--redbg)}.warns{color:var(--orange);background:var(--orangebg)}.neutral{color:#667085;background:#f0f3f7}.recording{color:var(--primary);background:var(--primary2)}
+.filters{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}.field{display:flex;gap:8px;align-items:center}.field label{font-size:13px;color:#556173;white-space:nowrap}.control{height:38px;border:1px solid #dbe2ec;border-radius:8px;background:#fff;padding:0 11px;min-width:145px;color:#334155}.control.wide{min-width:230px}
+.progress{height:8px;background:#eef2f6;border-radius:99px;overflow:hidden}.progress i{display:block;height:100%;background:var(--primary);border-radius:99px}.low{color:var(--red);font-weight:700}.kv{display:grid;grid-template-columns:160px 1fr;border:1px solid var(--line);border-bottom:0}.kv div{padding:11px 13px;border-bottom:1px solid var(--line)}.kv .k{background:#f8fafc;font-weight:650;color:#566174}.section-title{font-weight:700;margin:20px 0 10px}.codebox{background:#0f172a;color:#d7e3f5;border-radius:10px;padding:14px;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;max-height:220px;overflow:auto}
+.modal-mask{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}.modal-mask.show{display:flex}.modal{background:#fff;border-radius:15px;width:min(820px,95vw);max-height:88vh;overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.24)}.modal.small{width:min(460px,92vw)}.modal.large{width:min(1120px,96vw)}.modal-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:white;z-index:2}.modal-body{padding:20px}.modal-foot{padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px}.x{font-size:22px;color:#8b97aa;cursor:pointer}
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:16px}.tab{padding:10px 14px;cursor:pointer;color:#697586;border-bottom:2px solid transparent}.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:700}
+.detail-top{display:grid;grid-template-columns:1fr 1fr;gap:16px}.badge{display:inline-block;padding:3px 8px;border-radius:6px;font-size:12px;background:#eef3ff;color:#3a6ce8}.toggle{width:42px;height:24px;border-radius:99px;background:#d8dee8;position:relative;display:inline-block;vertical-align:middle;cursor:pointer}.toggle:after{content:"";position:absolute;width:18px;height:18px;top:3px;left:3px;background:white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:.2s}.toggle.on{background:var(--primary)}.toggle.on:after{left:21px}.config-grid{display:grid;grid-template-columns:180px 1fr;gap:12px 16px;align-items:center}.help{padding:12px 14px;background:#fff8eb;border:1px solid #f5cf8a;color:#a96b0b;border-radius:10px;font-size:12px;line-height:1.65}.empty{padding:50px;text-align:center;color:#8a96a8}
+
+.org-layout{display:grid;grid-template-columns:310px 1fr;gap:16px;align-items:start}
+.org-tree{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.org-tree-head{padding:16px 18px;border-bottom:1px solid var(--line);font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.tree{padding:10px 0}
+.tree-row{display:flex;align-items:center;gap:8px;padding:10px 14px 10px 18px;cursor:pointer;border-left:3px solid transparent}
+.tree-row:hover{background:#f8fafc}.tree-row.active{background:#eef4ff;border-left-color:var(--primary);color:#1f5fd6;font-weight:700}
+.tree-row.lv2{padding-left:38px}.tree-row.lv3{padding-left:58px}.tree-row.lv4{padding-left:78px}
+.tree-actions{margin-left:auto;display:flex;gap:7px;color:var(--primary);font-size:13px}
+.org-main{min-width:0}
+.org-current{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:16px;font-weight:700}
+.org-code{color:#7b8798;font-size:12px;margin-left:6px}
+
+@media(max-width:1200px){.cards{grid-template-columns:repeat(3,1fr)}.two,.three{grid-template-columns:1fr}}@media(max-width:820px){.sidebar{width:210px}.main{margin-left:210px}.content{padding:18px}.cards{grid-template-columns:1fr 1fr}.topright .pill{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">Z</div><div><h1>智能工牌 IoT 系统</h1><p>设备与数据链路管理平台</p></div></div>
+    <div id="nav"></div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div class="crumb">智能工牌系统 / <b id="crumb">IoT 首页</b></div>
+      <div class="topright"><div class="pill">● 平台运行正常</div><div class="pill">最后同步：2026-10-12 09:36:18</div><div class="avatar">PM</div></div>
+    </header>
+    <section class="content" id="content"></section>
+  </main>
+</div>
+
+<div class="modal-mask" id="modalMask" onclick="maskClose(event)">
+  <div class="modal" id="modal">
+    <div class="modal-head"><b id="modalTitle">详情</b><span class="x" onclick="closeModal()">×</span></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot" id="modalFoot"><button class="btn" onclick="closeModal()">关闭</button></div>
+  </div>
+</div>
+
+<script>
+const state={page:'home', selected:[], openGroups:{log:true}, currentDevice:null};
+const devices=[
+ {sn:'BDG-000231',brand:'Badge',model:'X2',store:'上海静安店',user:'张晨',status:'在线',battery:82,signal:'良好',record:'录音中',firmware:'v2.3.1',sync:'2026-10-12 09:35:10',slice:'5分钟',mode:'自动录音'},
+ {sn:'BDG-000418',brand:'Badge',model:'M5',store:'杭州滨江店',user:'李哲',status:'在线',battery:46,signal:'弱',record:'录音中',firmware:'v2.3.0',sync:'2026-10-12 09:34:51',slice:'10分钟',mode:'按键录音'},
+ {sn:'BDG-000522',brand:'VoiceBadge',model:'S3',store:'苏州工业园店',user:'王睿',status:'离线',battery:14,signal:'--',record:'未知',firmware:'v2.2.8',sync:'2026-10-12 08:16:04',slice:'5分钟',mode:'自动录音'},
+ {sn:'BDG-000638',brand:'Badge',model:'X2 Pro',store:'上海浦东店',user:'周宁',status:'在线',battery:67,signal:'良好',record:'未录音',firmware:'v2.3.1',sync:'2026-10-12 09:35:01',slice:'15分钟',mode:'声控录音'},
+ {sn:'BDG-000702',brand:'Badge',model:'L1',store:'南京河西店',user:'赵辰',status:'离线',battery:18,signal:'--',record:'--',firmware:'v2.2.9',sync:'2026-10-11 16:21:45',slice:'10分钟',mode:'自动录音'}
+];
+const menus=[
+ {group:'工作台',items:[{id:'home',label:'IoT 首页',ico:'⌂'}]},
+ {group:'设备',items:[{id:'devices',label:'设备管理',ico:'▣'}]},
+ {group:'录音',items:[{id:'voiceprint',label:'声纹管理',ico:'◌'}]},
+ {group:'组织',items:[{id:'org',label:'组织机构管理',ico:'⌘'}]},
+ {group:'运维',items:[{id:'ota',label:'OTA 升级',ico:'⇧'},{id:'sim',label:'流量卡管理',ico:'▤'},{id:'storage',label:'存储与回调',ico:'↔'},{id:'push',label:'推送日志',ico:'↗'}]},
+ {group:'日志',items:[{id:'logGroup',label:'日志',ico:'☷',children:[{id:'heartbeat',label:'设备心跳日志'},{id:'filelog',label:'文件上传日志'},{id:'controlLog',label:'操控日志'}]}]}
+];
+function renderNav(){
+ const root=document.getElementById('nav'); root.innerHTML='';
+ menus.forEach(sec=>{
+   const wrap=document.createElement('div');wrap.className='nav-section';
+   wrap.innerHTML=`<div class="nav-title">${sec.group}</div>`;
+   sec.items.forEach(it=>{
+     if(it.children){
+       const ni=document.createElement('div');ni.className='nav-item';ni.innerHTML=`<span class="ico">${it.ico}</span>${it.label}<span class="chev">⌃</span>`;
+       ni.onclick=()=>{state.openGroups.log=!state.openGroups.log;renderNav()};wrap.appendChild(ni);
+       const sub=document.createElement('div');sub.className='subwrap '+(state.openGroups.log?'open':'');
+       it.children.forEach(c=>{const el=document.createElement('div');el.className='nav-sub '+(state.page===c.id?'active':'');el.textContent=c.label;el.onclick=()=>go(c.id,c.label);sub.appendChild(el)});wrap.appendChild(sub);
+     } else {
+       const el=document.createElement('div');el.className='nav-item '+(state.page===it.id?'active':'');el.innerHTML=`<span class="ico">${it.ico}</span>${it.label}`;el.onclick=()=>go(it.id,it.label);wrap.appendChild(el);
+     }
+   });root.appendChild(wrap);
+ });
+}
+function go(id,label){state.page=id;document.getElementById('crumb').textContent=label||titleFor(id);renderNav();renderPage()}
+function titleFor(id){const map={home:'IoT 首页',devices:'设备管理',upload:'录音上传日志',voiceprint:'声纹管理',org:'组织机构管理',ota:'OTA 升级',sim:'流量卡管理',storage:'存储与回调',push:'推送日志',heartbeat:'设备心跳日志',filelog:'文件上传日志',controlLog:'操控日志'};return map[id]||id}
+function pageHead(t,sub,actions=''){return `<div class="pagehead"><div><h2>${t}</h2><p>${sub||''}</p></div><div class="actions">${actions}</div></div>`}
+function status(v){return `<span class="status ${v==='在线'?'online':v==='离线'?'offline':v==='成功'||v==='执行成功'?'success':v==='失败'||v==='下发失败'?'fail':'neutral'}">${v}</span>`}
+function openModal(title,body,foot,cls=''){document.getElementById('modalTitle').textContent=title;document.getElementById('modalBody').innerHTML=body;document.getElementById('modalFoot').innerHTML=foot||`<button class="btn" onclick="closeModal()">关闭</button>`;document.getElementById('modal').className='modal '+cls;document.getElementById('modalMask').classList.add('show')}
+function closeModal(){document.getElementById('modalMask').classList.remove('show')}
+function maskClose(e){if(e.target.id==='modalMask')closeModal()}
+function renderPage(){const c=document.getElementById('content');({home:renderHome,devices:renderDevices,upload:renderUpload,voiceprint:renderVoiceprint,org:renderOrg,ota:renderOTA,sim:renderSIM,storage:renderStorage,push:renderPush,heartbeat:renderHeartbeat,filelog:renderFileLog,controlLog:renderControlLog}[state.page]||renderHome)(c)}
+
+function renderHome(c){
+ c.innerHTML=pageHead('IoT 首页','实时掌握智能工牌在线状态、离线状态与设备运行情况')+`
+ <div class="grid cards">
+   ${[['设备总数','12,680','全部已纳管设备'],['已激活','11,420','激活率 90.1%'],['绑定设备','9,832','当前已绑定工牌数量'],['离线设备','1,588','需关注长期离线'],['低电量设备','186','电量低于 20%']].map((x,i)=>`<div class="card metric"><div class="label">${x[0]}</div><div class="num ${i===4?'warn':''}">${x[1]}</div><div class="hint">${x[2]}</div></div>`).join('')}
+ </div>
+ <div class="grid two">
+   <div class="panel"><div class="panelhead"><div><h3>近 7 天在线设备数</h3><div class="hint">按日统计在线设备规模</div></div><span class="badge">近7天</span></div>
+     <div class="chart">${[['10/06',9368],['10/07',9482],['10/08',9560],['10/09',9612],['10/10',9721],['10/11',9788],['10/12',9832]].map(x=>`<div class="bar" style="height:${Math.round((x[1]-9000)/9)+105}px"><em>${x[1]}</em><span>${x[0]}</span></div>`).join('')}</div>
+   </div>
+   <div class="panel"><div class="panelhead"><div><h3>低电量提醒列表</h3><div class="hint">电量低于 20% 的设备</div></div><button class="btn link" onclick="showLowBattery()">查看更多</button></div>
+     <div class="tablewrap"><table class="table" style="min-width:600px"><thead><tr><th>SN</th><th>门店/人员</th><th>电量</th><th>最后同步</th></tr></thead><tbody>
+     ${devices.concat([{sn:'BDG-000811',store:'宁波中心店',user:'陈远',battery:12,sync:'2026-10-12 09:20:18'},{sn:'BDG-000836',store:'合肥政务店',user:'刘宇',battery:9,sync:'2026-10-12 09:18:30'},{sn:'BDG-000921',store:'武汉光谷店',user:'孙博',battery:17,sync:'2026-10-12 09:15:02'},{sn:'BDG-001022',store:'无锡新城店',user:'许明',battery:11,sync:'2026-10-12 09:10:06'},{sn:'BDG-001118',store:'常州武进店',user:'邹杰',battery:15,sync:'2026-10-12 09:02:41'}]).filter(d=>d.battery<20).slice(0,10).map(d=>`<tr><td>${d.sn}</td><td>${d.store} / ${d.user}</td><td class="low">${d.battery}%</td><td>${d.sync}</td></tr>`).join('')}
+     </tbody></table></div>
+   </div>
+ </div>`;
+}
+function showLowBattery(){openModal('低电量设备明细',`<div class="filters"><input class="control wide" placeholder="搜索 SN / 门店 / 人员"><select class="control"><option>全部电量</option><option><10%</option><option>10%-20%</option></select><button class="btn primary">查询</button></div><div class="tablewrap"><table class="table"><thead><tr><th>SN</th><th>门店/人员</th><th>电量</th><th>状态</th><th>最后同步</th></tr></thead><tbody>${devices.filter(d=>d.battery<20).map(d=>`<tr><td>${d.sn}</td><td>${d.store}/${d.user}</td><td class="low">${d.battery}%</td><td>${status(d.status)}</td><td>${d.sync}</td></tr>`).join('')}</tbody></table></div>`,null,'large')}
+
+function renderDevices(c){
+ c.innerHTML=pageHead('设备管理','设备注册、换绑、解绑、调拨、远程监控与参数下发',`<button class="btn" onclick="batchCmd()">批量下发指令</button><button class="btn primary" onclick="deviceRegister()">设备注册</button><button class="btn" onclick="batchRegister()">批量注册</button>`)+`
+ <div class="filters">
+   <input class="control wide" placeholder="搜索 SN / 人员 / 门店">
+   <select class="control"><option>全部状态</option><option>在线</option><option>离线</option></select>
+   <select class="control"><option>切片时间</option><option>5分钟</option><option>10分钟</option><option>15分钟</option></select>
+   <select class="control"><option>录音模式</option><option>自动录音</option><option>按键录音</option><option>声控录音</option></select>
+   <button class="btn primary">查询</button><button class="btn">重置</button><button class="btn">导出</button>
+ </div>
+ <div class="tablewrap"><table class="table"><thead><tr><th><input type="checkbox" onchange="toggleAll(this)"></th><th>SN</th><th>工牌品牌</th><th>工牌型号</th><th>门店 / 人员</th><th>状态</th><th>电量</th><th>信号</th><th>切片时间</th><th>录音模式</th><th>固件版本</th><th>最后同步</th><th>操作</th></tr></thead><tbody>
+ ${devices.map((d,i)=>`<tr><td><input type="checkbox" class="devcheck" value="${i}"></td><td><b>${d.sn}</b></td><td>${d.brand}</td><td>${d.model}</td><td>${d.store}<br>${d.user}</td><td>${status(d.status)}</td><td class="${d.battery<20?'low':''}">${d.battery}%</td><td>${d.signal}</td><td>${d.slice}</td><td>${d.mode}</td><td>${d.firmware}</td><td>${d.sync}</td><td><button class="btn small" onclick="deviceDetail(${i})">详情</button> <button class="btn small" onclick="deviceRebind(${i})">换绑</button> <button class="btn small" onclick="deviceTransfer(${i})">调拨</button> <button class="btn small danger" onclick="deviceUnbind(${i})">解绑</button></td></tr>`).join('')}
+ </tbody></table></div>`;
+}
+function toggleAll(el){document.querySelectorAll('.devcheck').forEach(x=>x.checked=el.checked)}
+function batchCmd(){openModal('批量下发指令',`<div class="config-grid"><label>切片时间</label><select class="control"><option>5分钟</option><option>10分钟</option><option>15分钟</option></select><label>录音模式</label><select class="control"><option>自动录音</option><option>按键录音</option><option>声控录音</option></select></div><div class="help" style="margin-top:16px">将向当前勾选设备下发配置，设备收到后会在操控日志中记录 ACK 结果。</div>`,`<button class="btn" onclick="closeModal()">取消</button><button class="btn primary" onclick="closeModal();toast('指令已下发')">确认下发</button>`,'small')}
+
+
+
+function downloadRegisterTemplate(){
+ const csv = '\ufeff设备SN,工牌品牌,工牌型号,所属门店,绑定人员,切片时间,录音模式\nBDG-000001,Badge,X2,上海静安店,张三,5分钟,自动录音';
+ const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+ const url = URL.createObjectURL(blob);
+ const a = document.createElement('a');
+ a.href = url;
+ a.download = '设备批量注册模板.csv';
+ document.body.appendChild(a);
+ a.click();
+ document.body.removeChild(a);
+ URL.revokeObjectURL(url);
+ toast('模板已下载');
+}
+
+function batchRegister(){
+ openModal('批量注册设备',`
+  <div class="section-title" style="margin-top:0">批量导入</div>
+  <div class="help">请上传设备注册文件。建议文件包含：设备SN、工牌品牌、工牌型号、所属门店、绑定人员、切片时间、录音模式。</div>
+  <div style="margin-top:14px;display:flex;justify-content:flex-end">
+    <button class="btn" onclick="downloadRegisterTemplate()">下载模板</button>
+  </div>
+  <div style="margin-top:12px"><input type="file" class="control" accept=".xlsx,.xls,.csv" style="width:100%"></div>
+  <div class="section-title">导入说明</div>
+  <div style="color:#667085;font-size:13px;line-height:1.8">系统会在提交前校验重复SN、必填字段和数据格式；有错误的数据不会直接注册。</div>
+ `,`<button class="btn" onclick="closeModal()">取消</button><button class="btn primary" onclick="closeModal();toast('批量注册任务已提交')">开始注册</button>`,'small')
+}
+
+function deviceRegister(){
+ openModal('设备注册',`
+  <div class="config-grid">
+    <label>设备SN</label><input class="control" placeholder="请输入设备SN">
+    <label>工牌品牌</label><input class="control" placeholder="请输入工牌品牌">
+    <label>工牌型号</label><input class="control" placeholder="请输入工牌型号">
+    <label>所属门店</label><select class="control"><option>请选择门店</option><option>上海静安店</option><option>杭州滨江店</option><option>苏州工业园店</option><option>上海浦东店</option></select>
+    <label>绑定人员</label><input class="control" placeholder="请输入人员姓名">
+    <label>切片时间</label><select class="control"><option>5分钟</option><option>10分钟</option><option>15分钟</option></select>
+    <label>录音模式</label><select class="control"><option>自动录音</option><option>按键录音</option><option>声控录音</option></select>
+  </div>`,
+  `<button class="btn" onclick="closeModal()">取消</button><button class="btn primary" onclick="closeModal();toast('设备注册成功')">确认注册</button>`,'small')
+}
+function deviceRebind(i){
+ const d=devices[i];
+ openModal('设备换绑',`
+  <div class="kv">
+    <div class="k">设备SN</div><div>${d.sn}</div>
+    <div class="k">当前门店</div><div>${d.store}</div>
+    <div class="k">当前人员</div><div>${d.user}</div>
+  </div>
+  <div class="section-title">新的绑定关系</div>
+  <div class="config-grid">
+    <label>新门店</label><select class="control"><option>${d.store}</option><option>上海静安店</option><option>杭州滨江店</option><option>苏州工业园店</option><option>南京河西店</option></select>
+    <label>新人员</label><input class="control" placeholder="请输入新绑定人员">
+  </div>`,
+  `<button class="btn" onclick="closeModal()">取消</button><button class="btn primary" onclick="closeModal();toast('换绑成功')">确认换绑</button>`,'small')
+}
+function deviceTransfer(i){
+ const d=devices[i];
+ openModal('设备调拨',`
+  <div class="kv">
+    <div class="k">设备SN</div><div>${d.sn}</div>
+    <div class="k">当前门店</div><div>${d.store}</div>
+  </div>
+  <div class="section-title">调拨信息</div>
+  <div class="config-grid">
+    <label>调拨至门店</label><select class="control"><option>请选择目标门店</option><option>上海静安店</option><option>杭州滨江店</option><option>苏州工业园店</option><option>南京河西店</option></select>
+    <label>调拨备注</label><input class="control" placeholder="可选填写">
+  </div>`,
+  `<button class="btn" onclick="closeModal()">取消</button><button class="btn primary" onclick="closeModal();toast('调拨操作已提交')">确认调拨</button>`,'small')
+}
+
+function deviceUnbind(i){openModal('确认解绑',`<p>确认解绑设备 <b>${devices[i].sn}</b> 吗？解绑后该设备将解除当前人员/门店关系。</p>`,`<button class="btn" onclick="closeModal()">取消</button><button class="btn danger" onclick="closeModal();toast('设备已解绑')">确认解绑</button>`,'small')}
+function deviceDetail(i){
+ const d=devices[i];state.currentDevice=i;
+ openModal('设备详情',`
+ <div class="detail-top">
+  <div class="panel" style="box-shadow:none"><h3>基础信息</h3><div class="kv" style="margin-top:12px">
+   ${[['SN',d.sn],['工牌品牌',d.brand],['工牌型号',d.model],['门店',d.store],['人员',d.user],['设备状态',status(d.status)],['切片时间',d.slice],['录音模式',d.mode],['电量',d.battery+'%'],['信号',d.signal],['固件版本',d.firmware],['最后同步',d.sync]].map(x=>`<div class="k">${x[0]}</div><div>${x[1]}</div>`).join('')}
+  </div></div>
+  <div class="panel" style="box-shadow:none"><h3>运行监控</h3><div class="kv" style="margin-top:12px">
+   ${[['今日在线时长','8h 32min'],['今日录音次数','12次'],['今日录音总时长','3h 26min'],['最近心跳','10秒前'],['最近上传','1分钟前'],['存储占用','32%']].map(x=>`<div class="k">${x[0]}</div><div>${x[1]}</div>`).join('')}
+  </div></div>
+ </div>
+ <div class="section-title">快捷功能</div>
+ <div class="actions"><button class="btn primary" onclick="recordCompleteness()">录音完整度</button><button class="btn" onclick="batchCmd()">下发指令</button></div>
+ `,`<button class="btn" onclick="closeModal()">关闭</button>`, 'large')
+}
+function recordCompleteness(){openModal('录音完整度查询',`
+ <div class="filters"><label>查询时间</label><input type="date" class="control" value="2026-10-12"><span>至</span><input type="date" class="control" value="2026-10-12"><button class="btn primary">查询</button></div>
+ <div class="tablewrap"><table class="table"><thead><tr><th>日期</th><th>应有录音/切片数量</th><th>实际上传数量</th><th>完整数量</th><th>缺失数量</th><th>完整度</th><th>状态</th></tr></thead><tbody>
+ <tr><td>2026-10-12</td><td>48</td><td>47</td><td>46</td><td>2</td><td><b>95.83%</b></td><td><span class="status warns">存在缺失</span></td></tr>
+ <tr><td>2026-10-11</td><td>48</td><td>48</td><td>48</td><td>0</td><td><b>100%</b></td><td>${status('成功')}</td></tr>
+ </tbody></table></div>`,null,'large')}
+
+
+function renderAlerts(c){
+ c.innerHTML=pageHead('告警中心','集中查看设备异常、处理状态与告警规则')+`
+ <div class="tabs">
+   <div class="tab active">当前告警</div><div class="tab">告警规则</div><div class="tab">告警历史</div>
+ </div>
+ <div class="grid cards" style="grid-template-columns:repeat(4,1fr)">
+  ${[['未处理告警','52'],['严重告警','8'],['一般告警','26'],['提醒','18']].map(x=>`<div class="card metric"><div class="label">${x[0]}</div><div class="num">${x[1]}</div></div>`).join('')}
+ </div>
+ <div class="filters"><select class="control"><option>全部告警类型</option><option>设备离线</option><option>低电量</option><option>长期未使用</option><option>录音上传失败</option><option>异常重启</option><option>存储异常</option><option>版本异常</option></select><select class="control"><option>全部等级</option><option>严重</option><option>一般</option><option>提醒</option></select><select class="control"><option>全部状态</option><option>待处理</option><option>处理中</option><option>已恢复</option><option>已关闭</option></select><button class="btn primary">查询</button><button class="btn">重置</button></div>
+ <div class="tablewrap"><table class="table"><thead><tr><th>告警等级</th><th>告警类型</th><th>设备SN</th><th>门店</th><th>告警内容</th><th>发生时间</th><th>持续时间</th><th>状态</th><th>操作</th></tr></thead><tbody>
+ ${[
+ ['严重','设备离线','BDG-000522','苏州工业园店','设备连续离线超过2小时','2026-10-12 06:12:03','3h24m','待处理'],
+ ['一般','低电量','BDG-000702','南京河西店','设备电量低于20%','2026-10-12 08:15:22','1h21m','处理中'],
+ ['提醒','版本异常','BDG-000418','杭州滨江店','固件版本低于当前正式版本','2026-10-12 08:42:12','54m','待处理']
+ ].map((r,i)=>`<tr><td><span class="status ${r[0]==='严重'?'fail':r[0]==='一般'?'warns':'neutral'}">${r[0]}</span></td>${r.slice(1,7).map(v=>`<td>${v}</td>`).join('')}<td>${r[7]}</td><td><button class="btn small" onclick="alertDetail(${i})">详情</button></td></tr>`).join('')}
+ </tbody></table></div>`;
+}
+function alertDetail(i){
+ openModal('告警详情',`<div class="kv"><div class="k">设备SN</div><div>${i===0?'BDG-000522':'BDG-000702'}</div><div class="k">告警类型</div><div>${i===0?'设备离线':'低电量'}</div><div class="k">当前状态</div><div>${i===0?'待处理':'处理中'}</div><div class="k">发生时间</div><div>2026-10-12 08:15:22</div><div class="k">相关说明</div><div>系统根据已配置告警规则自动生成。</div></div>`,`<button class="btn" onclick="closeModal()">关闭</button><button class="btn primary" onclick="closeModal();toast('告警状态已更新')">确认处理</button>`,'small')
+}
+
+function renderPipeline(c){
+ c.innerHTML=pageHead('数据链路监控','监控工牌录音从产生、上传到ASR、AI分析和业务数据生成的完整链路')+`
+ <div class="grid cards" style="grid-template-columns:repeat(5,1fr)">
+ ${[['设备录音','10,326'],['上传成功','10,286'],['ASR成功','10,238'],['AI分析成功','10,205'],['BI入库','10,192']].map(x=>`<div class="card metric"><div class="label">${x[0]}</div><div class="num">${x[1]}</div></div>`).join('')}
+ </div>
+ <div class="panel">
+  <div class="panelhead"><div><h3>今日数据处理链路</h3><div class="hint">点击异常环节可查看对应任务</div></div><span class="badge">链路成功率 99.1%</span></div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:24px 0">
+   ${['工牌','录音','上传','ASR','AI分析','生成会话','BI入库'].map((x,i)=>`<div style="display:flex;align-items:center;gap:10px"><div class="card" style="padding:18px 22px;box-shadow:none"><b>${x}</b><div class="hint" style="margin-top:6px">${i===3?'12项失败':'运行正常'}</div></div>${i<6?'<span style="color:#9aa6b7">→</span>':''}</div>`).join('')}
+  </div>
+ </div>
+ <div class="panel" style="margin-top:16px"><div class="panelhead"><h3>异常任务</h3><button class="btn">导出</button></div>
+ <div class="tablewrap"><table class="table"><thead><tr><th>录音ID</th><th>设备SN</th><th>异常环节</th><th>异常原因</th><th>发生时间</th><th>状态</th><th>操作</th></tr></thead><tbody>
+ <tr><td>REC-20261012-0912</td><td>BDG-000418</td><td>ASR</td><td>任务处理超时</td><td>2026-10-12 09:21:08</td><td>${status('失败')}</td><td><button class="btn small">详情</button></td></tr>
+ <tr><td>REC-20261012-0888</td><td>BDG-000522</td><td>AI分析</td><td>模型任务异常</td><td>2026-10-12 09:02:11</td><td>${status('失败')}</td><td><button class="btn small">详情</button></td></tr>
+ </tbody></table></div></div>`;
+}
+
+function renderRemote(c){
+ c.innerHTML=pageHead('远程配置','创建设备配置模板并按设备范围下发')+`
+ <div class="grid two">
+  <div class="panel"><div class="panelhead"><h3>配置模板</h3><button class="btn primary">新建模板</button></div>
+   <div class="tablewrap"><table class="table" style="min-width:650px"><thead><tr><th>模板名称</th><th>切片时间</th><th>录音模式</th><th>心跳频率</th><th>操作</th></tr></thead><tbody>
+   <tr><td>标准配置</td><td>5分钟</td><td>自动录音</td><td>30秒</td><td><button class="btn small">编辑</button></td></tr>
+   <tr><td>低功耗配置</td><td>10分钟</td><td>按键录音</td><td>60秒</td><td><button class="btn small">编辑</button></td></tr>
+   </tbody></table></div>
+  </div>
+  <div class="panel"><h3>配置下发</h3><div class="config-grid" style="margin-top:16px"><label>配置模板</label><select class="control"><option>标准配置</option><option>低功耗配置</option></select><label>目标范围</label><select class="control"><option>选择设备</option><option>选择门店</option></select><label>目标设备</label><input class="control" placeholder="请输入SN，多个用逗号分隔"></div><div style="margin-top:16px"><button class="btn primary" onclick="toast('配置下发任务已创建')">下发配置</button></div></div>
+ </div>`;
+}
+
+function renderOps(c){
+ c.innerHTML=pageHead('运维管理','管理设备入库、分配、维修、换机与报废生命周期')+`
+ <div class="tabs"><div class="tab active">设备入库</div><div class="tab">设备分配</div><div class="tab">维修管理</div><div class="tab">换机管理</div><div class="tab">报废管理</div></div>
+ <div class="filters"><input class="control" placeholder="设备SN"><select class="control"><option>全部生命周期状态</option><option>已入库</option><option>已分配</option><option>使用中</option><option>维修</option><option>备用</option><option>报废</option></select><button class="btn primary">查询</button><button class="btn">重置</button><button class="btn">批量导入</button></div>
+ <div class="tablewrap"><table class="table"><thead><tr><th>设备SN</th><th>工牌品牌</th><th>工牌型号</th><th>批次</th><th>所属门店</th><th>生命周期状态</th><th>入库时间</th><th>更新时间</th><th>操作</th></tr></thead><tbody>
+ <tr><td>BDG-000231</td><td>Badge</td><td>X2</td><td>2026Q3-01</td><td>上海静安店</td><td><span class="status online">使用中</span></td><td>2026-08-21 10:03:12</td><td>2026-10-12 09:35:10</td><td><button class="btn small">详情</button></td></tr>
+ <tr><td>BDG-000702</td><td>Badge</td><td>L1</td><td>2026Q2-04</td><td>南京河西店</td><td><span class="status warns">维修</span></td><td>2026-06-16 14:21:08</td><td>2026-10-11 16:21:45</td><td><button class="btn small">详情</button></td></tr>
+ </tbody></table></div>`;
+}
+
+function renderUpload(c){
+ c.innerHTML=pageHead('录音上传日志','查询设备录音文件上传结果，失败记录仅用于定位，不提供重试')+`
+ <div class="filters"><input class="control" placeholder="设备编号"><input class="control wide" placeholder="文件名"><select class="control"><option>全部状态</option><option>成功</option><option>失败</option></select><input class="control" type="date" value="2026-10-12"><button class="btn primary">搜索</button><button class="btn">重置</button></div>
+ ${fileUploadTable(true)}`;
+}
+function fileUploadTable(withTitle=false){const rows=[
+ ['20261012_090818.opus','00001','4G26090800010110001','249.3','2026-10-12 09:10:03','成功','—'],
+ ['20261012_090508.opus','00001','4G26090800010110001','741.3','2026-10-12 09:10:00','成功','—'],
+ ['20261012_090438.opus','00001','4G26090800010110001','7.4','2026-10-12 09:09:49','失败','网络超时'],
+ ['20261012_085527.opus','00002','4G26090800010110088','74.8','2026-10-12 08:56:13','成功','—'],
+ ['20261012_085232.opus','00003','4G26090800010110132','48.4','2026-10-12 08:56:12','成功','—']
+ ];return `<div class="tablewrap"><table class="table"><thead><tr><th>文件名</th><th>设备编号</th><th>SN</th><th>大小(KB)</th><th>上传时间</th><th>状态</th><th>失败原因</th></tr></thead><tbody>${rows.map(r=>`<tr>${r.map((v,i)=>`<td>${i===5?status(v):v}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
+
+function renderVoiceprint(c){
+ c.innerHTML=pageHead('声纹管理','维护人员声纹信息',`<button class="btn primary" onclick="newVoice()">新增声纹</button>`)+`
+ <div class="filters"><input class="control wide" placeholder="搜索人员姓名 / 工号"><select class="control"><option>全部门店</option><option>上海静安店</option><option>杭州滨江店</option></select><button class="btn primary">查询</button><button class="btn">重置</button></div>
+ <div class="tablewrap"><table class="table"><thead><tr><th>人员姓名</th><th>工号</th><th>所属门店</th><th>声纹ID</th><th>样本数量</th><th>创建时间</th><th>更新时间</th><th>操作</th></tr></thead><tbody>
+ ${[['张晨','A10231','上海静安店','VP-20261001-001','1','2026-10-01 11:26:13','2026-10-08 09:12:20'],['李哲','A11882','杭州滨江店','VP-20261002-011','1','2026-10-02 14:05:20','2026-10-02 14:05:20'],['周宁','A12002','上海浦东店','VP-20261004-008','1','2026-10-04 10:18:05','2026-10-11 16:31:44']].map((r,i)=>`<tr>${r.map(v=>`<td>${v}</td>`).join('')}<td><button class="btn small" onclick="voiceDetail(${i})">详情</button> <button class="btn small danger">删除</button></td></tr>`).join('')}
+ </tbody></table></div>`;
+}
+
+function voiceDetail(i){
+ const rows=[
+  ['张晨','A10231','上海静安店','VP-20261001-001','1','2026-10-01 11:26:13','2026-10-08 09:12:20'],
+  ['李哲','A11882','杭州滨江店','VP-20261002-011','1','2026-10-02 14:05:20','2026-10-02 14:05:20'],
+  ['周宁','A12002','上海浦东店','VP-20261004-008','1','2026-10-04 10:18:05','2026-10-11 16:31:44']
+ ];
+ const r=rows[i];
+ openModal('声纹详情',`
+  <div class="kv">
+    <div class="k">人员姓名</div><div>${r[0]}</div>
+    <div class="k">工号</div><div>${r[1]}</div>
+    <div class="k">所属门店</div><div>${r[2]}</div>
+    <div class="k">声纹ID</div><div>${r[3]}</div>
+    <div class="k">样本数量</div><div>${r[4]}</div>
+    <div class="k">创建时间</div><div>${r[5]}</div>
+    <div class="k">更新时间</div><div>${r[6]}</div>
+  </div>
+  <div class="section-title">声纹样本</div>
+  <div class="kv">
+    <div class="k">样本文件</div><div>voice_sample_01.wav</div>
+    <div class="k">时长</div><div>18s</div>
+    <div class="k">上传时间</div><div>${r[6]}</div>
+    <div class="k">操作</div><div><button class="btn small">播放</button></div>
+  </div>
+  <div class="help" style="margin-top:12px">每个人员最多保留 1 条声纹样本。重新上传新样本后，系统会自动覆盖原有样本。</div>`,null,'large')
+}
+
+function newVoice(){openModal('新增声纹',`<div class="config-grid"><label>人员姓名</label><input class="control" placeholder="请输入人员姓名"><label>工号</label><input class="control" placeholder="请输入工号"><label>所属门店</label><select class="control"><option>请选择门店</option><option>上海静安店</option><option>杭州滨江店</option></select><label>上传声纹样本</label><input type="file" class="control"></div><div class="help" style="margin-top:14px">每个人员最多保留 1 条声纹样本；如该人员已有样本，本次上传并保存后将自动覆盖旧样本。</div>`,`<button class="btn" onclick="closeModal()">取消</button><button class="btn primary" onclick="closeModal()">保存</button>`,'small')}
+
+function renderConfig(c){
+ c.innerHTML=pageHead('设备配置','维护可下发给智能工牌的设备参数模板')+`
+ <div class="grid two"><div class="panel"><div class="panelhead"><h3>默认设备参数</h3><button class="btn primary">保存配置</button></div>
+ <div class="config-grid"><label>切片时间</label><select class="control"><option>5分钟</option><option>10分钟</option><option>15分钟</option></select><label>录音模式</label><select class="control"><option>自动录音</option><option>按键录音</option><option>声控录音</option></select><label>心跳频率</label><select class="control"><option>10秒</option><option>30秒</option><option>60秒</option></select></div></div>
+ <div class="panel"><h3>配置说明</h3><div class="help" style="margin-top:14px">设备参数保存后不会自动下发。请在设备管理中勾选设备后，通过“批量下发指令”将切片时间或录音模式发送到设备。</div></div></div>`;
+}
+
+
+const orgTree=[
+ {id:'buick',level:1,code:'ZH2402001',name:'别克',parent:null},
+ {id:'region1',level:2,code:'BK01',name:'一区',parent:'buick'},
+ {id:'star',level:3,code:'BK011',name:'明星',parent:'region1'},
+ {id:'zhaosheng',level:3,code:'BK012',name:'赵升阳',parent:'region1'},
+ {id:'shenwei',level:3,code:'BK013',name:'申威',parent:'region1'},
+ {id:'wuer',level:3,code:'BK014',name:'武二宾',parent:'region1'},
+ {id:'xiaxiang',level:3,code:'BK015',name:'夏翔',parent:'region1'},
+ {id:'luoqian',level:3,code:'BK017',name:'罗千',parent:'region1'},
+ {id:'chengjun',level:3,code:'BK018',name:'程军',parent:'region1'},
+ {id:'houzhenyu',level:3,code:'BK019',name:'侯振宇',parent:'region1'},
+ {id:'zhangdonggang',level:3,code:'BK0110',name:'张东刚',parent:'region1'}
+];
+let currentOrg='star';
+
+const storesByOrg={
+ star:[
+  {code:'SJ1140',name:'北京联通昊普',abbr:'北京联通昊普',phone:'010-65881140',creator:'admin',online:'在网'},
+  {code:'SJ1170',name:'北京联通成功',abbr:'北京联通成功',phone:'010-65881170',creator:'admin',online:'在网'},
+  {code:'SJ1119',name:'北京联通景隆',abbr:'北京联通景隆',phone:'010-65881119',creator:'admin',online:'在网'}
+ ],
+ zhaosheng:[
+  {code:'SJ1221',name:'天津凯通别克',abbr:'天津凯通',phone:'022-66881221',creator:'admin',online:'在网'},
+  {code:'SJ1228',name:'天津永濠别克',abbr:'天津永濠',phone:'022-66881228',creator:'admin',online:'在网'}
+ ]
+};
+
+function renderOrg(c){
+ const cur=orgTree.find(x=>x.id===currentOrg)||orgTree[2];
+ c.innerHTML=pageHead('组织机构管理','分层级维护组织机构，最小颗粒度到门店；各级均维护编号和名称')+`
+ <div class="org-layout">
+  <div class="org-tree">
+   <div class="org-tree-head"><span>组织树</span><button class="btn small primary" onclick="orgAddChild('${cur.id}')">新增</button></div>
+   <div class="tree">
+    ${orgTree.map(n=>`<div class="tree-row lv${n.level} ${n.id===currentOrg?'active':''}" onclick="selectOrg('${n.id}')">
+      <span>${n.level===1?'▾':n.level===2?'▾':'•'}</span>
+      <span>${n.name}<span class="org-code">(${n.code})</span></span>
+      <span class="tree-actions" onclick="event.stopPropagation()">
+       <span title="新增下级" onclick="orgAddChild('${n.id}')">＋</span>
+       <span title="编辑" onclick="orgEdit('${n.id}')">✎</span>
+       ${n.level>1?`<span title="删除" onclick="orgDelete('${n.id}')">⌫</span>`:''}
+      </span>
+    </div>`).join('')}
+   </div>
+  </div>
+  <div class="org-main">
+   <div class="org-current">当前选择：${cur.name}<span class="org-code">(${cur.code})</span></div>
+   <div class="filters">
+    <div class="field"><label>门店编码</label><input class="control" placeholder="请输入门店编码"></div>
+    <div class="field"><label>门店名称</label><input class="control" placeholder="请输入门店名称"></div>
+    <div class="field"><label>在网状态</label><select class="control"><option>全部</option><option>在网</option><option>不在网</option></select></div>
+    <button class="btn primary">查询</button><button class="btn">重置</button>
+   </div>
+   <div class="panel">
+    <div class="panelhead">
+     <div class="actions"><button class="btn primary" onclick="storeAdd()">新增门店</button><button class="btn" onclick="batchOnline()">批量变更在网状态</button></div>
+     <div class="hint">共 ${getStores().length} 条数据　<button class="btn small" onclick="renderPage()">刷新</button></div>
+    </div>
+    <div class="tablewrap"><table class="table"><thead><tr><th>序号</th><th>门店编码</th><th>门店名称</th><th>简称</th><th>电话</th><th>在网状态</th><th>创建人</th><th>操作</th></tr></thead><tbody>
+     ${getStores().map((s,i)=>`<tr><td>${i+1}</td><td><b>${s.code}</b></td><td>${s.name}</td><td>${s.abbr}</td><td>${s.phone}</td><td>${status(s.online==='在网'?'在线':'离线')}</td><td>${s.creator}</td><td><button class="btn small" onclick="storeEdit(${i})">编辑</button> <button class="btn small danger" onclick="storeDelete(${i})">删除</button></td></tr>`).join('')}
+    </tbody></table></div>
+   </div>
+  </div>
+ </div>`;
+}
+function getStores(){return storesByOrg[currentOrg]||[]}
+function selectOrg(id){currentOrg=id;renderPage()}
+function orgAddChild(id){
+ const p=orgTree.find(x=>x.id===id);
+ openModal('新增下级组织',`
+  <div class="config-grid">
+   <label>上级组织</label><input class="control" value="${p.name} (${p.code})" disabled>
+   <label>组织编号</label><input class="control" placeholder="请输入编号">
+   <label>组织名称</label><input class="control" placeholder="请输入名称">
+  </div>`,`<button class="btn" onclick="closeModal()">取消</button><button class="btn primary" onclick="closeModal();toast('组织已新增')">保存</button>`,'small')
+}
+function orgEdit(id){
+ const p=orgTree.find(x=>x.id===id);
+ openModal('编辑组织',`
+  <div class="config-grid">
+   <label>组织编号</label><input class="control" value="${p.code}">
+   <label>组织名称</label><input class="control" value="${p.name}">
+  </div>`,`<button class="btn" onclick="closeModal()">取消</button><button class="btn primary" onclick="closeModal();toast('组织信息已更新')">保存</button>`,'small')
+}
+function orgDelete(id){
+ const p=orgTree.find(x=>x.id===id);
+ openModal('确认删除',`<p>确认删除组织 <b>${p.name} (${p.code})</b> 吗？</p><div class="help">如该组织下仍有下级组织或门店，应先完成迁移后再删除。</div>`,`<button class="btn" onclick="closeModal()">取消</button><button class="btn danger" onclick="closeModal();toast('删除操作已提交')">确认删除</button>`,'small')
+}
+function storeAdd(){
+ const cur=orgTree.find(x=>x.id===currentOrg);
+ openModal('新增门店',`
+  <div class="config-grid">
+   <label>所属组织</label><input class="control" value="${cur.name} (${cur.code})" disabled>
+   <label>门店编码</label><input class="control" placeholder="请输入门店编码">
+   <label>门店名称</label><input class="control" placeholder="请输入门店名称">
+   <label>门店简称</label><input class="control" placeholder="请输入简称">
+   <label>联系电话</label><input class="control" placeholder="请输入联系电话">
+   <label>在网状态</label><select class="control"><option>在网</option><option>不在网</option></select>
+  </div>`,`<button class="btn" onclick="closeModal()">取消</button><button class="btn primary" onclick="closeModal();toast('门店新增成功')">保存</button>`,'small')
+}
+function storeEdit(i){
+ const s=getStores()[i];
+ openModal('编辑门店',`
+  <div class="config-grid">
+   <label>门店编码</label><input class="control" value="${s.code}">
+   <label>门店名称</label><input class="control" value="${s.name}">
+   <label>门店简称</label><input class="control" value="${s.abbr}">
+   <label>联系电话</label><input class="control" value="${s.phone}">
+   <label>在网状态</label><select class="control"><option ${s.online==='在网'?'selected':''}>在网</option><option ${s.online!=='在网'?'selected':''}>不在网</option></select>
+  </div>`,`<button class="btn" onclick="closeModal()">取消</button><button class="btn primary" onclick="closeModal();toast('门店信息已更新')">保存</button>`,'small')
+}
+function storeDelete(i){
+ const s=getStores()[i];
+ openModal('确认删除门店',`<p>确认删除门店 <b>${s.name} (${s.code})</b> 吗？</p>`,`<button class="btn" onclick="closeModal()">取消</button><button class="btn danger" onclick="closeModal();toast('门店已删除')">确认删除</button>`,'small')
+}
+function batchOnline(){
+ openModal('批量变更在网状态',`<div class="config-grid"><label>目标状态</label><select class="control"><option>在网</option><option>不在网</option></select><label>说明</label><input class="control" placeholder="可选填写"></div>`,`<button class="btn" onclick="closeModal()">取消</button><button class="btn primary" onclick="closeModal();toast('状态变更已提交')">确认</button>`,'small')
+}
+
+function renderOTA(c){
+ c.innerHTML=pageHead('OTA 升级','管理固件版本与升级任务',`<button class="btn primary">创建升级任务</button>`)+`
+ <div class="grid cards" style="grid-template-columns:repeat(4,1fr)">${[['当前正式版本','v2.3.1'],['升级中设备','126'],['今日成功','2,716'],['今日失败','93']].map(x=>`<div class="card metric"><div class="label">${x[0]}</div><div class="num">${x[1]}</div></div>`).join('')}</div>
+ <div class="tablewrap"><table class="table"><thead><tr><th>任务名称</th><th>目标版本</th><th>目标设备</th><th>成功</th><th>失败</th><th>未在线</th><th>成功率</th><th>创建时间</th><th>操作</th></tr></thead><tbody><tr><td>全国设备 v2.3.1 升级</td><td>v2.3.1</td><td>2,836</td><td>2,716</td><td>93</td><td>27</td><td>95.8%</td><td>2026-10-11 22:00:00</td><td><button class="btn small">详情</button></td></tr></tbody></table></div>`;
+}
+
+
+function renderSIM(c){
+ c.innerHTML=pageHead('流量卡管理','查看智能工牌流量卡绑定关系、套餐用量与当前状态')+`
+ <div class="filters">
+   <input class="control" placeholder="ICCID">
+   <input class="control" placeholder="设备SN">
+   <select class="control"><option>全部运营商</option><option>中国移动</option><option>中国联通</option><option>中国电信</option></select>
+   <select class="control"><option>全部状态</option><option>正常</option><option>停机</option><option>未激活</option></select>
+   <button class="btn primary">查询</button><button class="btn">重置</button><button class="btn">导出</button>
+ </div>
+ <div class="tablewrap"><table class="table"><thead><tr>
+   <th>ICCID</th><th>设备SN</th><th>运营商</th><th>套餐</th><th>本月已用</th><th>剩余流量</th><th>状态</th><th>套餐到期时间</th><th>最后同步</th><th>操作</th>
+ </tr></thead><tbody>
+ ${[
+ ['898600123456789001','BDG-000231','中国移动','1GB/月','386MB','638MB','正常','2027-01-31','2026-10-12 09:35:10'],
+ ['898601123456789002','BDG-000418','中国联通','2GB/月','1.2GB','848MB','正常','2027-02-28','2026-10-12 09:34:51'],
+ ['898603123456789003','BDG-000522','中国电信','1GB/月','998MB','26MB','正常','2026-12-31','2026-10-12 08:16:04'],
+ ['898600123456789004','BDG-000638','中国移动','1GB/月','214MB','810MB','正常','2027-03-31','2026-10-12 09:35:01'],
+ ['898601123456789005','BDG-000702','中国联通','1GB/月','—','—','停机','2026-10-31','2026-10-11 16:21:45']
+ ].map((r,i)=>`<tr>${r.map((v,j)=>`<td>${j===6?status(v==='正常'?'在线':v==='停机'?'离线':v):v}</td>`).join('')}<td><button class="btn small" onclick="simDetail(${i})">详情</button></td></tr>`).join('')}
+ </tbody></table></div>`;
+}
+function simDetail(i){
+ const rows=[
+ ['898600123456789001','BDG-000231','中国移动','1GB/月','386MB','638MB','正常','2027-01-31','2026-10-12 09:35:10'],
+ ['898601123456789002','BDG-000418','中国联通','2GB/月','1.2GB','848MB','正常','2027-02-28','2026-10-12 09:34:51'],
+ ['898603123456789003','BDG-000522','中国电信','1GB/月','998MB','26MB','正常','2026-12-31','2026-10-12 08:16:04'],
+ ['898600123456789004','BDG-000638','中国移动','1GB/月','214MB','810MB','正常','2027-03-31','2026-10-12 09:35:01'],
+ ['898601123456789005','BDG-000702','中国联通','1GB/月','—','—','停机','2026-10-31','2026-10-11 16:21:45']
+ ];
+ const r=rows[i];
+ openModal('流量卡详情',`
+  <div class="kv">
+   <div class="k">ICCID</div><div>${r[0]}</div>
+   <div class="k">绑定设备SN</div><div>${r[1]}</div>
+   <div class="k">运营商</div><div>${r[2]}</div>
+   <div class="k">当前套餐</div><div>${r[3]}</div>
+   <div class="k">本月已用</div><div>${r[4]}</div>
+   <div class="k">剩余流量</div><div>${r[5]}</div>
+   <div class="k">状态</div><div>${r[6]}</div>
+   <div class="k">套餐到期时间</div><div>${r[7]}</div>
+   <div class="k">最后同步</div><div>${r[8]}</div>
+  </div>`,null,'small')
+}
+
+function renderStorage(c){
+ c.innerHTML=pageHead('存储与回调','配置开放鉴权、消息推送、录音存储与自动合并规则')+`
+ <div class="panel"><div class="panelhead"><h3>开发管理</h3><button class="btn primary">保存配置</button></div>
+  <div class="config-grid"><label>子机构</label><select class="control"><option>请选择子机构</option><option>智能工牌业务平台</option></select><label>AppId</label><input class="control" value="gzzd_api" disabled><label>AppSecret</label><div><input class="control" type="password" value="xxxxxxxxxxxxxxxx"><button class="btn small">随机生成</button></div><label>IP白名单</label><textarea class="control" style="height:76px;padding-top:10px" placeholder="一行一个 IP 或 CIDR，例如：192.168.1.1 或 192.168.1.0/24"></textarea></div>
+ </div>
+ <div class="panel" style="margin-top:16px"><div class="panelhead"><h3>消息推送管理</h3><button class="btn primary">保存配置</button></div>
+  <div class="config-grid"><label>接口推送地址</label><input class="control" value="https://gp-poc.unicdata.cn/api/qc/tasksingle/yhy/voice/callback?tenantNo=ZH2405001"><label>报警 Webhook 地址</label><input class="control" placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxxxxx"><label>额外请求头</label><textarea class="control" style="height:64px;padding-top:10px">{ "Authorization": "Bearer token" }</textarea><label>推送版本号</label><div><label><input type="radio" checked name="ver"> 明文</label>　<label><input type="radio" name="ver"> 带签名</label>　<label><input type="radio" name="ver"> 签名+加密</label></div></div>
+  <div class="help" style="margin-top:14px">明文：推送数据无加密、无签名请求头，存在请求伪装风险。带签名：推送数据无加密，签名请求头需自行校验。签名+加密：推送数据加密并携带 multipart/form-data。</div>
+  <div class="section-title">消息类型开关</div>
+  <div class="grid two"><div class="config-grid">${['连接日志推送','GPS日志推送','操控日志推送','转写文本推送'].map((x,i)=>`<label>${x}</label><span class="toggle ${i?'on':''}" onclick="this.classList.toggle('on')"></span>`).join('')}</div><div class="config-grid">${['心跳日志推送','上传日志推送','调试日志推送','设备录音推送'].map((x,i)=>`<label>${x}</label><span class="toggle ${i===0||i===3?'on':''}" onclick="this.classList.toggle('on')"></span>`).join('')}</div></div>
+ </div>
+ <div class="panel" style="margin-top:16px"><div class="panelhead"><h3>录音推送配置</h3><button class="btn primary">保存配置</button></div>
+  <div class="config-grid"><label>存储提供商</label><div><label><input type="radio" checked name="sp"> http</label>　<label><input type="radio" name="sp"> oss</label>　<label><input type="radio" name="sp"> cos</label>　<label><input type="radio" name="sp"> s3</label></div><label>请求地址</label><input class="control" value="https://gp-poc.unicdata.cn/api/qc/tasks"></div>
+  <div class="help" style="margin-top:14px">HTTP 模式直接通过请求地址推送；OSS/COS/S3 模式根据 Bucket、地域和 Endpoint 配置对象存储。</div>
+ </div>
+ <div class="panel" style="margin-top:16px"><div class="panelhead"><h3>录音自动合并配置</h3><button class="btn primary">保存配置</button></div>
+  <div class="config-grid"><label>录音自动合并</label><span class="toggle" onclick="this.classList.toggle('on')"></span><label>合并类型</label><div><label><input type="radio" checked name="merge"> 时间范围</label>　<label><input type="radio" name="merge"> 分段标记</label>　<label><input type="radio" name="merge"> 固定间隔</label></div><label>推送类型</label><div><label><input type="radio" checked name="pushType"> 不推送</label>　<label><input type="radio" name="pushType"> 录音文件</label>　<label><input type="radio" name="pushType"> JSON数据</label></div><label>合并时间段</label><div><input class="control" type="time" value="08:00"> — <input class="control" type="time" value="22:00"> <button class="btn small">添加时间段</button></div></div>
+  <div class="help" style="margin-top:14px">时间范围：根据录音开始时间自动合并指定范围内录音；分段标记：根据录音文件名分段结束标记自动合并；固定间隔：按指定录音数合并。</div>
+ </div>`;
+}
+
+function renderPush(c){
+ c.innerHTML=pageHead('推送日志','查询消息推送记录、执行耗时与返回结果')+`
+ <div class="filters"><input class="control" placeholder="设备编号"><select class="control"><option>全部数据类型</option><option>ASR文本</option><option>设备心跳日志</option><option>音频</option><option>操控日志</option></select><select class="control"><option>是否推送成功</option><option>成功</option><option>失败</option></select><input class="control wide" placeholder="推送地址"><input type="date" class="control" value="2026-10-12"><button class="btn primary">查询</button><button class="btn">重置</button></div>
+ <div class="tablewrap"><table class="table"><thead><tr><th>序号</th><th>推送地址</th><th>设备编号</th><th>数据类型</th><th>推送状态</th><th>执行时间(ms)</th><th>版本</th><th>推送时间</th><th>操作</th></tr></thead><tbody>
+ ${[
+ ['1','https://gp-poc...','BG8699989088196104','ASR文本','成功','3030','v1','2026-10-12 09:47:54'],
+ ['2','https://gp-poc...','BG8699989088196104','设备心跳日志','成功','585','v1','2026-10-12 09:47:22'],
+ ['3','https://gp-poc...','BG8699989088196104','音频','成功','11247','v1','2026-10-12 09:47:01'],
+ ['4','https://gp-poc...','BG8699989088196104','操控日志','失败','908','v1','2026-10-12 09:46:45']
+ ].map((r,i)=>`<tr>${r.map((v,j)=>`<td>${j===4?status(v):v}</td>`).join('')}<td><button class="btn link" onclick="pushDetail(${i})">详情</button></td></tr>`).join('')}
+ </tbody></table></div>`;
+}
+function pushDetail(i){openModal('推送日志详情',`
+ <div class="kv">${[['推送地址','https://gp-poc.unicdata.cn/api/qc/tasksingle/yhy/voice/callback?tenantNo=ZH2405001'],['设备编号','BG8699989088196104'],['数据类型',i===0?'ASR文本':'设备心跳日志'],['推送状态',status(i===3?'失败':'成功')],['执行时间(ms)','3030'],['版本','v1'],['推送时间','2026-10-12 09:47:54']].map(x=>`<div class="k">${x[0]}</div><div>${x[1]}</div>`).join('')}</div>
+ <div class="section-title">请求头参数</div><div class="codebox">[{"key":"User-Agent","value":["push-client/1.0.0"]},{"key":"Api-Version","value":["v1"]}]</div>
+ <div class="section-title">推送数据</div><div class="codebox">{"taskId":857861403529285,"text":"客户咨询车型配置与交付周期","speakerId":1,"startTimeStr":"00:00:07","endTimeStr":"00:00:12"}</div>
+ <div class="section-title">原始数据</div><div class="codebox">{"dataType":"AudioText","timeStamp":"2026-10-12T09:47:54","deviceNo":"BG8699989088196104","data":{"filename":"BG869998...mp3","status":"SUCCESS"}}</div>
+ <div class="section-title">错误信息 / 返回结果</div><div class="codebox">${i===3?'{"code":500,"msg":"下游接口响应超时"}':'OK, {"code":200,"msg":"处理成功","data":null}'}</div>
+ `,null,'large')}
+
+function renderHeartbeat(c){
+ const rows=Array.from({length:10},(_,i)=>['2026-10-12 09:'+String(35-i).padStart(2,'0')+':23','00001','4G26090800010110001',i===5?'3904':'3908','未充电','在线','59630 / 59622','v2.3.1','{"user_id":"XiaoLiu","device_no":"00001"...}']);
+ c.innerHTML=pageHead('设备心跳日志','查询设备心跳上报数据')+`
+ <div class="filters"><input class="control" placeholder="设备编号"><input class="control wide" placeholder="SN"><label>上报时间</label><input type="date" class="control" value="2026-10-12"><button class="btn primary">搜索</button><button class="btn">重置</button></div>
+ <div class="tablewrap"><table class="table"><thead><tr><th>时间</th><th>设备编号</th><th>SN</th><th>电量(mV)</th><th>充电状态</th><th>状态</th><th>存储总量/剩余(MB)</th><th>固件版本</th><th>原始报文</th></tr></thead><tbody>${rows.map(r=>`<tr>${r.map((v,i)=>`<td>${i===5?status(v):v}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+function renderFileLog(c){
+ c.innerHTML=pageHead('文件上传日志','查询设备文件上传结果')+`
+ <div class="filters"><input class="control" placeholder="设备编号"><input class="control wide" placeholder="文件名"><select class="control"><option>全部状态</option><option>成功</option><option>失败</option></select><label>上传时间</label><input type="date" class="control" value="2026-10-12"><button class="btn primary">搜索</button><button class="btn">重置</button></div>${fileUploadTable()}`;
+}
+function renderControlLog(c){
+ const rows=[
+ ['2026-10-12 09:09:47','00001','4G26090800010110001','文件上传','249','执行成功'],
+ ['2026-10-12 08:56:10','00001','4G26090800010110001','文件上传','249','执行成功'],
+ ['2026-10-12 08:52:33','00001','4G26090800010110001','开始录音','249','执行成功'],
+ ['2026-10-12 08:49:02','00001','4G26090800010110001','结束录音','249','执行成功'],
+ ['2026-10-12 08:30:50','00001','4G26090800010110001','解绑','1','下发失败']
+ ];
+ c.innerHTML=pageHead('操控日志','查询设备指令、操作与 ACK 结果')+`
+ <div class="filters"><input class="control" placeholder="设备编号"><select class="control"><option>全部操作类型</option><option>文件上传</option><option>开始录音</option><option>结束录音</option><option>解绑</option><option>配置下发</option></select><select class="control"><option>全部结果</option><option>执行成功</option><option>下发失败</option></select><input type="date" class="control" value="2026-10-12"><button class="btn primary">搜索</button><button class="btn">重置</button></div>
+ <div class="tablewrap"><table class="table"><thead><tr><th>时间</th><th>设备编号</th><th>SN</th><th>操作类型</th><th>操作人</th><th>结果</th><th>详情</th></tr></thead><tbody>${rows.map((r,i)=>`<tr>${r.map((v,j)=>`<td>${j===5?status(v):v}</td>`).join('')}<td><button class="btn link" onclick="controlDetail(${i})">查看</button></td></tr>`).join('')}</tbody></table></div>`;
+}
+function controlDetail(i){openModal('操控日志详情',`<div class="kv">${[['设备编号','00001'],['SN','4G26090800010110001'],['操作类型',i===4?'解绑':'文件上传'],['参数','—'],['结果',status(i===4?'下发失败':'执行成功')],['失败原因',i===4?'设备离线':'—'],['ACK 时间','2026-10-12 09:09:48'],['结束时间','2026-10-12 09:09:48']].map(x=>`<div class="k">${x[0]}</div><div>${x[1]}</div>`).join('')}</div>`)}
+
+function toast(msg){const d=document.createElement('div');d.textContent=msg;d.style.cssText='position:fixed;right:28px;top:84px;background:#182338;color:#fff;padding:10px 16px;border-radius:8px;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.2)';document.body.appendChild(d);setTimeout(()=>d.remove(),1700)}
+renderNav();renderPage();
+</script>
+</body>
+</html>
